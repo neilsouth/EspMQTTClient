@@ -180,8 +180,14 @@ void EspMQTTClient::loop()
   if(mqttStateChanged)
     return;
 
-  // Procewss the delayed execution commands
+  // Process the delayed execution commands
   processDelayedExecutionRequests(); 
+
+  static bool otaStarted = false;
+  if (WiFi.status() == WL_CONNECTED && !otaStarted) {
+    ArduinoOTA.begin();
+    otaStarted = true;
+  }
 }
 
 bool EspMQTTClient::handleWiFi()
