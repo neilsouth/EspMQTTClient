@@ -8,7 +8,8 @@
 #include <WebServer.h>
 #include <Update.h>
 
-#define ESP32_WEB_UPDATE_HTML "<html><body><form method='POST' action='' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form></body></html>"
+// Show hostname (client name) on the update page using client-side JS
+#define ESP32_WEB_UPDATE_HTML "<html><body><h1 id='title'></h1><script>document.getElementById('title').textContent = 'Update ' + location.hostname;</script><form method='POST' action='' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form></body></html>"
 #define ESP32_WEB_UPDATE_SUCCESS_RESPONSE "<META http-equiv=\"refresh\" content=\"10;URL=/\">Update Success! Rebooting...\n"
 
 class ESP32HTTPUpdateServer
@@ -19,6 +20,7 @@ private:
   String _username;
   String _password;
   bool _serialDebugging;
+  String _deviceName;
 
 public:
   ESP32HTTPUpdateServer(bool serialDebugging = false)
@@ -26,13 +28,16 @@ public:
     _server = NULL;
     _username = "";
     _password = "";
+    _deviceName = "";
+    _serialDebugging = serialDebugging;
   }
-
-  void setup(WebServer* server, const char* path = "/", const char* username = "", const char* password = "")
+  // Add optional deviceName so the update page can show a friendly name server-side
+  void setup(WebServer* server, const char* path = "/", const char* username = "", const char* password = "", const char* deviceName = "")
   {
     _server = server;
     _username = username;
     _password = password;
+    if (deviceName != NULL) _deviceName = String(deviceName);
 
     // Get of the index handling
     _server->on(path, HTTP_GET, [&]() {
@@ -41,7 +46,15 @@ public:
         return _server->requestAuthentication();
 
       _server->sendHeader("Connection", "close");
-      _server->send(200, "text/html", ESP32_WEB_UPDATE_HTML);
+      // If a device name was provided, render it server-side; otherwise fall back to hostname JS
+      if (_deviceName.length() > 0) {
+        String html = "<html><body><h1>Update ";
+        html += _deviceName;
+        html += "</h1><form method='POST' action='' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form></body></html>";
+        _server->send(200, "text/html", html);
+      } else {
+        _server->send(200, "text/html", ESP32_WEB_UPDATE_HTML);
+      }
     });
 
     // Post of the file handling

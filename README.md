@@ -25,7 +25,7 @@ The MQTT communication depends on the [PubSubClient Library](https://github.com/
 EspMQTTClient client(
   "WifiSSID",
   "WifiPassword",
-  "192.168.1.100",  // MQTT Broker server ip
+  "192.168.1.100",  // MQTT Broker server ip, better to use DNS name ie mqtt.local
   "MQTTUsername",   // Can be omitted if not needed
   "MQTTPassword",   // Can be omitted if not needed
   "TestClient"      // Client name that uniquely identify your device
@@ -113,6 +113,16 @@ void enableHTTPWebUpdater(const char* username, const char* password, const char
 void enableHTTPWebUpdater(const char* address = "/");
 ```
 
+#### Improved update screen identification
+
+When the HTTP updater is enabled, the upload page title includes the device hostname or MQTT client name. That makes it much easier to confirm which board you are updating when several devices expose the same updater route on your network.
+
+For example, a device created with the client name `StairLight` shows this heading on the update page:
+
+![Update page showing device name](docs/update-screen-identification.svg)
+
+This identification comes from the same client name you pass into `EspMQTTClient`, so the updater page stays aligned with the name used for MQTT and mDNS.
+
 Enable last will message. Must be set before the first loop() call.
 ```c++
 void enableLastWillMessage(const char* topic, const char* message, const bool retain = false);
@@ -131,6 +141,30 @@ void setMqttReconnectionAttemptDelay(const unsigned int milliseconds);
 Change the delay between each Wifi reconnection attempt. Default is 60 seconds.
 ```c++
 void setWifiReconnectionAttemptDelay(const unsigned int milliseconds);
+```
+
+Set or replace the WiFi credentials manually.
+```c++
+void setWifiCredentials(const char* wifiSsid, const char* wifiPassword);
+```
+
+Scan visible networks, pick the strongest SSID whose name starts with the given prefix,
+then store those credentials for the normal connection lifecycle. If no matching SSID is
+found, the prefix itself is kept as the fallback SSID. `maxChannel` defaults to `14`,
+which keeps the helper aligned with common 2.4 GHz channel ranges.
+```c++
+bool setWifiCredentialsFromStrongestSsidPrefix(
+  const char* wifiSsidPrefix,
+  const char* wifiPassword,
+  const uint8_t maxChannel = 14);
+```
+
+Example:
+```c++
+void setup() {
+  client.enableDebuggingMessages();
+  client.setWifiCredentialsFromStrongestSsidPrefix("My2-4WifiSSID", "WifiPassword");
+}
 ```
 
 Connection status

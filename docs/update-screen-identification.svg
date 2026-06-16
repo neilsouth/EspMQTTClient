@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="371" height="112" viewBox="0 0 371 112" role="img" aria-labelledby="title desc">
+  <title id="title">Updater screen showing device identification</title>
+  <desc id="desc">Firmware update page titled Update StairLight with a file chooser and Update button.</desc>
+  <rect width="371" height="112" fill="#ffffff"/>
+  <text x="8" y="40" fill="#000000" font-family="Georgia, 'Times New Roman', serif" font-size="28" font-weight="700">Update StairLight</text>
+  <rect x="8" y="69" width="77" height="23" fill="#f5f5f5" stroke="#7f7f7f"/>
+  <text x="16" y="85" fill="#000000" font-family="Arial, Helvetica, sans-serif" font-size="14">Choose file</text>
+  <text x="94" y="85" fill="#000000" font-family="Arial, Helvetica, sans-serif" font-size="14">No file chosen</text>
+  <rect x="260" y="69" width="58" height="23" fill="#f5f5f5" stroke="#7f7f7f"/>
+  <text x="274" y="85" fill="#000000" font-family="Arial, Helvetica, sans-serif" font-size="14">Update</text>
+</svg>
